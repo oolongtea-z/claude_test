@@ -1,0 +1,251 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: #f0f2f5;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 60px 16px;
+  color: #333;
+}
+
+.app {
+  width: 100%;
+  max-width: 560px;
+}
+
+h1 {
+  text-align: center;
+  font-size: 64px;
+  font-weight: 100;
+  color: #c8a0c8;
+  letter-spacing: -2px;
+  margin-bottom: 24px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06);
+  overflow: hidden;
+}
+
+/* Input area */
+.input-area {
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  border-bottom: 1px solid #ededed;
+  position: relative;
+}
+
+#toggle-all {
+  display: none;
+}
+
+.toggle-all-label {
+  font-size: 22px;
+  color: #ccc;
+  cursor: pointer;
+  padding: 16px 12px 16px 4px;
+  user-select: none;
+  transform: rotate(90deg);
+  display: inline-block;
+  transition: color 0.2s;
+}
+
+.toggle-all-label:hover,
+.toggle-all-active {
+  color: #737373;
+}
+
+#new-task {
+  flex: 1;
+  font-size: 22px;
+  border: none;
+  outline: none;
+  padding: 16px 0;
+  color: #333;
+  background: transparent;
+}
+
+#new-task::placeholder {
+  color: #ccc;
+  font-style: italic;
+}
+
+/* Task list */
+#task-list {
+  list-style: none;
+}
+
+#task-list li {
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  border-bottom: 1px solid #f0f0f0;
+  min-height: 56px;
+  animation: slideIn 0.15s ease;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+#task-list li:last-child {
+  border-bottom: none;
+}
+
+/* Custom checkbox */
+.task-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 26px;
+  height: 26px;
+  border: 2px solid #e0e0e0;
+  border-radius: 50%;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-right: 14px;
+  position: relative;
+  transition: border-color 0.2s;
+}
+
+.task-checkbox:hover {
+  border-color: #a0cfa0;
+}
+
+.task-checkbox:checked {
+  border-color: #82c882;
+  background: #82c882;
+}
+
+.task-checkbox:checked::after {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 2px;
+  width: 8px;
+  height: 13px;
+  border: 2px solid #fff;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg);
+}
+
+/* Task label */
+.task-label {
+  flex: 1;
+  font-size: 18px;
+  color: #333;
+  cursor: default;
+  word-break: break-word;
+  padding: 4px 0;
+  transition: color 0.2s;
+}
+
+.task-label.done {
+  text-decoration: line-through;
+  color: #bbb;
+}
+
+/* Delete button */
+.delete-btn {
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: #ccc;
+  cursor: pointer;
+  padding: 4px 8px;
+  opacity: 0;
+  transition: color 0.2s, opacity 0.2s;
+  line-height: 1;
+}
+
+#task-list li:hover .delete-btn {
+  opacity: 1;
+}
+
+.delete-btn:hover {
+  color: #e57373;
+}
+
+/* Footer */
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  font-size: 13px;
+  color: #999;
+  border-top: 1px solid #ededed;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.footer.hidden {
+  display: none;
+}
+
+#task-count {
+  min-width: 100px;
+}
+
+.filters {
+  display: flex;
+  gap: 4px;
+}
+
+.filter-btn {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 13px;
+  color: #777;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.filter-btn:hover {
+  border-color: #ddd;
+}
+
+.filter-btn.active {
+  border-color: #b0a0d0;
+  color: #6a4a9a;
+}
+
+#clear-completed {
+  background: none;
+  border: none;
+  font-size: 13px;
+  color: #999;
+  cursor: pointer;
+  transition: color 0.2s;
+  padding: 4px 0;
+}
+
+#clear-completed:hover {
+  color: #e57373;
+  text-decoration: underline;
+}
+
+#clear-completed.hidden {
+  display: none;
+}
+
+/* Empty state */
+.empty-hint {
+  text-align: center;
+  padding: 40px 20px;
+  color: #ccc;
+  font-size: 15px;
+  font-style: italic;
+}

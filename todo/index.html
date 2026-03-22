@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TODOアプリ</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>todos</h1>
+    </header>
+
+    <main class="card">
+      <div class="input-area">
+        <input type="checkbox" id="toggle-all" title="すべて完了/未完了">
+        <label for="toggle-all" class="toggle-all-label">❯</label>
+        <input type="text" id="new-task" placeholder="何をしますか？" autocomplete="off">
+      </div>
+
+      <ul id="task-list"></ul>
+
+      <footer id="footer" class="footer hidden">
+        <span id="task-count"></span>
+        <div class="filters">
+          <button class="filter-btn active" data-filter="all">すべて</button>
+          <button class="filter-btn" data-filter="active">未完了</button>
+          <button class="filter-btn" data-filter="completed">完了</button>
+        </div>
+        <button id="clear-completed" class="hidden">完了を削除</button>
+      </footer>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
