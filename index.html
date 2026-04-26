@@ -3,25 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>タイマー</title>
+  <title>ランダムポケモン</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
-    <h1>タイマー</h1>
+    <h1>ランダムポケモン</h1>
 
-    <div class="display" id="display">00:00:00</div>
+    <div class="card" id="card">
+      <div class="card-inner" id="cardInner">
+        <div class="placeholder" id="placeholder">
+          <span>クリックしてポケモンを表示</span>
+        </div>
 
-    <div class="controls">
-      <button id="startBtn" class="btn btn-start">スタート</button>
-      <button id="pauseBtn" class="btn btn-pause" disabled>一時停止</button>
-      <button id="resetBtn" class="btn btn-reset">リセット</button>
+        <div class="pokemon-info hidden" id="pokemonInfo">
+          <div class="pokemon-number" id="pokemonNumber">#000</div>
+          <div class="sprite-wrapper">
+            <img id="sprite" src="" alt="">
+          </div>
+          <div class="pokemon-name" id="pokemonName">???</div>
+          <div class="type-badges" id="typeBadges"></div>
+          <div class="stats" id="stats"></div>
+        </div>
+
+        <div class="loading hidden" id="loading">
+          <div class="pokeball">
+            <div class="pokeball-top"></div>
+            <div class="pokeball-middle"></div>
+            <div class="pokeball-bottom"></div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="lap-section">
-      <button id="lapBtn" class="btn btn-lap" disabled>ラップ</button>
-      <ul id="lapList"></ul>
-    </div>
+    <button class="btn" id="btn">次のポケモン</button>
   </div>
 
   <script src="app.js"></script>

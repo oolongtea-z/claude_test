@@ -1,62 +1,89 @@
-const display   = document.getElementById('display');
-const startBtn  = document.getElementById('startBtn');
-const pauseBtn  = document.getElementById('pauseBtn');
-const resetBtn  = document.getElementById('resetBtn');
-const lapBtn    = document.getElementById('lapBtn');
-const lapList   = document.getElementById('lapList');
+const card        = document.getElementById('card');
+const btn         = document.getElementById('btn');
+const placeholder = document.getElementById('placeholder');
+const pokemonInfo = document.getElementById('pokemonInfo');
+const loading     = document.getElementById('loading');
+const sprite      = document.getElementById('sprite');
+const pokemonName = document.getElementById('pokemonName');
+const pokemonNumber = document.getElementById('pokemonNumber');
+const typeBadges  = document.getElementById('typeBadges');
+const statsEl     = document.getElementById('stats');
 
-let intervalId  = null;
-let elapsed     = 0;   // ms
-let lapStart    = 0;
-let lapCount    = 0;
+const POKEMON_COUNT = 1025;
 
-function format(ms) {
-  const h = Math.floor(ms / 3600000);
-  const m = Math.floor((ms % 3600000) / 60000);
-  const s = Math.floor((ms % 60000) / 1000);
-  return [h, m, s].map(n => String(n).padStart(2, '0')).join(':');
+const STAT_COLORS = {
+  hp:              '#ff5959',
+  attack:          '#f5ac78',
+  defense:         '#fae078',
+  'special-attack':'#9db7f5',
+  'special-defense':'#a7db8d',
+  speed:           '#fa92b2',
+};
+
+const STAT_LABELS = {
+  hp:              'HP',
+  attack:          'こうげき',
+  defense:         'ぼうぎょ',
+  'special-attack':'とくこう',
+  'special-defense':'とくぼう',
+  speed:           'すばやさ',
+};
+
+function showLoading() {
+  placeholder.classList.add('hidden');
+  pokemonInfo.classList.add('hidden');
+  loading.classList.remove('hidden');
 }
 
-function tick() {
-  elapsed += 10;
-  display.textContent = format(elapsed);
+function showPokemon(data) {
+  loading.classList.add('hidden');
+
+  const imgSrc = data.sprites.other?.['official-artwork']?.front_default
+               || data.sprites.front_default;
+
+  sprite.src = imgSrc || '';
+  pokemonName.textContent = data.name;
+  pokemonNumber.textContent = `#${String(data.id).padStart(3, '0')}`;
+
+  typeBadges.innerHTML = data.types
+    .map(t => `<span class="type-badge type-${t.type.name}">${t.type.name}</span>`)
+    .join('');
+
+  statsEl.innerHTML = data.stats.map(s => {
+    const key   = s.stat.name;
+    const val   = s.base_stat;
+    const pct   = Math.min(100, Math.round((val / 255) * 100));
+    const color = STAT_COLORS[key] || '#aaa';
+    const label = STAT_LABELS[key] || key;
+    return `
+      <span class="stat-label">${label}</span>
+      <div class="stat-bar-wrap">
+        <div class="stat-bar">
+          <div class="stat-bar-fill" style="width:${pct}%; background:${color};"></div>
+        </div>
+        <span class="stat-value">${val}</span>
+      </div>`;
+  }).join('');
+
+  pokemonInfo.classList.remove('hidden');
 }
 
-startBtn.addEventListener('click', () => {
-  intervalId = setInterval(tick, 10);
-  startBtn.disabled = true;
-  pauseBtn.disabled = false;
-  lapBtn.disabled   = false;
-});
+async function fetchRandomPokemon() {
+  showLoading();
+  const id = Math.floor(Math.random() * POKEMON_COUNT) + 1;
+  try {
+    const res  = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+    const data = await res.json();
+    showPokemon(data);
+  } catch {
+    loading.classList.add('hidden');
+    placeholder.classList.remove('hidden');
+    placeholder.querySelector('span').textContent = '取得に失敗しました。もう一度お試しください。';
+  }
+}
 
-pauseBtn.addEventListener('click', () => {
-  clearInterval(intervalId);
-  intervalId = null;
-  pauseBtn.disabled = true;
-  startBtn.disabled = false;
-  startBtn.textContent = '再開';
-});
-
-resetBtn.addEventListener('click', () => {
-  clearInterval(intervalId);
-  intervalId = null;
-  elapsed   = 0;
-  lapStart  = 0;
-  lapCount  = 0;
-  display.textContent = '00:00:00';
-  startBtn.disabled   = false;
-  startBtn.textContent = 'スタート';
-  pauseBtn.disabled   = true;
-  lapBtn.disabled     = true;
-  lapList.innerHTML   = '';
-});
-
-lapBtn.addEventListener('click', () => {
-  lapCount++;
-  const lapTime = elapsed - lapStart;
-  lapStart = elapsed;
-
-  const li = document.createElement('li');
-  li.innerHTML = `<span class="lap-num">Lap ${lapCount}</span><span>${format(lapTime)}</span>`;
-  lapList.prepend(li);
+card.addEventListener('click', fetchRandomPokemon);
+btn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  fetchRandomPokemon();
 });
