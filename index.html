@@ -1,29 +1,394 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>タイマー</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>アラームアプリ</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #1a1a2e;
+      color: #eee;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: #16213e;
+      border-radius: 20px;
+      padding: 40px;
+      width: 360px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 1.4rem;
+      margin-bottom: 30px;
+      color: #a8dadc;
+      letter-spacing: 2px;
+    }
+
+    .clock {
+      text-align: center;
+      font-size: 3.5rem;
+      font-weight: 300;
+      letter-spacing: 4px;
+      color: #e2e2e2;
+      margin-bottom: 36px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .section-label {
+      font-size: 0.75rem;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+
+    .time-input-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .time-input-row input[type="time"] {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 2px solid #2c3e70;
+      background: #0f3460;
+      color: #eee;
+      font-size: 1.2rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .time-input-row input[type="time"]:focus {
+      border-color: #a8dadc;
+    }
+
+    .btn {
+      padding: 12px 20px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 600;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn-add {
+      background: #a8dadc;
+      color: #1a1a2e;
+      width: 100%;
+    }
+
+    .btn-add:hover {
+      background: #c9f0f2;
+    }
+
+    .alarm-list {
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .alarm-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #0f3460;
+      border-radius: 12px;
+      padding: 14px 18px;
+      transition: opacity 0.3s;
+    }
+
+    .alarm-item.off {
+      opacity: 0.45;
+    }
+
+    .alarm-time {
+      font-size: 1.4rem;
+      letter-spacing: 2px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .alarm-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .toggle {
+      position: relative;
+      width: 44px;
+      height: 24px;
+    }
+
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      inset: 0;
+      background: #2c3e70;
+      border-radius: 24px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .slider::before {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      left: 3px;
+      top: 3px;
+      background: #eee;
+      border-radius: 50%;
+      transition: transform 0.2s;
+    }
+
+    .toggle input:checked + .slider {
+      background: #a8dadc;
+    }
+
+    .toggle input:checked + .slider::before {
+      transform: translateX(20px);
+    }
+
+    .btn-delete {
+      background: transparent;
+      color: #e06c75;
+      font-size: 1.2rem;
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+
+    .btn-delete:hover {
+      background: rgba(224, 108, 117, 0.15);
+    }
+
+    .ring-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+    }
+
+    .ring-overlay.active {
+      display: flex;
+    }
+
+    .ring-box {
+      background: #16213e;
+      border-radius: 20px;
+      padding: 40px 50px;
+      text-align: center;
+      box-shadow: 0 0 60px rgba(168, 218, 220, 0.3);
+      animation: pulse 1s infinite alternate;
+    }
+
+    @keyframes pulse {
+      from { box-shadow: 0 0 40px rgba(168, 218, 220, 0.2); }
+      to   { box-shadow: 0 0 80px rgba(168, 218, 220, 0.6); }
+    }
+
+    .ring-time {
+      font-size: 3rem;
+      letter-spacing: 4px;
+      color: #a8dadc;
+      margin-bottom: 8px;
+    }
+
+    .ring-label {
+      font-size: 1rem;
+      color: #888;
+      margin-bottom: 28px;
+    }
+
+    .btn-stop {
+      background: #e06c75;
+      color: #fff;
+      padding: 14px 36px;
+      border-radius: 12px;
+      font-size: 1rem;
+    }
+
+    .btn-stop:hover {
+      background: #f08090;
+    }
+
+    .empty {
+      text-align: center;
+      color: #444;
+      font-size: 0.9rem;
+      margin-top: 12px;
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h1>タイマー</h1>
 
-    <div class="display" id="display">00:00:00</div>
+<div class="container">
+  <h1>⏰ アラーム</h1>
+  <div class="clock" id="clock">00:00:00</div>
 
-    <div class="controls">
-      <button id="startBtn" class="btn btn-start">スタート</button>
-      <button id="pauseBtn" class="btn btn-pause" disabled>一時停止</button>
-      <button id="resetBtn" class="btn btn-reset">リセット</button>
-    </div>
-
-    <div class="lap-section">
-      <button id="lapBtn" class="btn btn-lap" disabled>ラップ</button>
-      <ul id="lapList"></ul>
-    </div>
+  <div class="section-label">時刻を設定</div>
+  <div class="time-input-row">
+    <input type="time" id="timeInput" />
   </div>
+  <button class="btn btn-add" onclick="addAlarm()">アラームを追加</button>
 
-  <script src="app.js"></script>
+  <div class="alarm-list" id="alarmList">
+    <div class="empty" id="emptyMsg">アラームがありません</div>
+  </div>
+</div>
+
+<div class="ring-overlay" id="ringOverlay">
+  <div class="ring-box">
+    <div class="ring-time" id="ringTime"></div>
+    <div class="ring-label">アラームが鳴っています</div>
+    <button class="btn btn-stop" onclick="stopAlarm()">止める</button>
+  </div>
+</div>
+
+<script>
+  let alarms = JSON.parse(localStorage.getItem('alarms') || '[]');
+  let ringingAlarmId = null;
+  let audioCtx = null;
+  let beepInterval = null;
+
+  function pad(n) {
+    return String(n).padStart(2, '0');
+  }
+
+  function updateClock() {
+    const now = new Date();
+    document.getElementById('clock').textContent =
+      `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+  }
+
+  function checkAlarms() {
+    const now = new Date();
+    const current = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+    if (now.getSeconds() !== 0) return;
+
+    alarms.forEach(alarm => {
+      if (alarm.enabled && alarm.time === current && ringingAlarmId === null) {
+        triggerAlarm(alarm);
+      }
+    });
+  }
+
+  function triggerAlarm(alarm) {
+    ringingAlarmId = alarm.id;
+    document.getElementById('ringTime').textContent = alarm.time;
+    document.getElementById('ringOverlay').classList.add('active');
+    startBeep();
+  }
+
+  function startBeep() {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    beepInterval = setInterval(() => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+      osc.start(audioCtx.currentTime);
+      osc.stop(audioCtx.currentTime + 0.4);
+    }, 600);
+  }
+
+  function stopAlarm() {
+    clearInterval(beepInterval);
+    if (audioCtx) { audioCtx.close(); audioCtx = null; }
+    document.getElementById('ringOverlay').classList.remove('active');
+    ringingAlarmId = null;
+  }
+
+  function addAlarm() {
+    const val = document.getElementById('timeInput').value;
+    if (!val) { alert('時刻を選択してください'); return; }
+    const alarm = { id: Date.now(), time: val, enabled: true };
+    alarms.push(alarm);
+    alarms.sort((a, b) => a.time.localeCompare(b.time));
+    saveAndRender();
+  }
+
+  function deleteAlarm(id) {
+    alarms = alarms.filter(a => a.id !== id);
+    saveAndRender();
+  }
+
+  function toggleAlarm(id) {
+    const alarm = alarms.find(a => a.id === id);
+    if (alarm) alarm.enabled = !alarm.enabled;
+    saveAndRender();
+  }
+
+  function saveAndRender() {
+    localStorage.setItem('alarms', JSON.stringify(alarms));
+    renderAlarms();
+  }
+
+  function renderAlarms() {
+    const list = document.getElementById('alarmList');
+    const empty = document.getElementById('emptyMsg');
+    list.innerHTML = '';
+
+    if (alarms.length === 0) {
+      list.appendChild(empty);
+      return;
+    }
+
+    alarms.forEach(alarm => {
+      const item = document.createElement('div');
+      item.className = 'alarm-item' + (alarm.enabled ? '' : ' off');
+
+      item.innerHTML = `
+        <span class="alarm-time">${alarm.time}</span>
+        <div class="alarm-controls">
+          <label class="toggle">
+            <input type="checkbox" ${alarm.enabled ? 'checked' : ''}
+              onchange="toggleAlarm(${alarm.id})" />
+            <span class="slider"></span>
+          </label>
+          <button class="btn btn-delete" onclick="deleteAlarm(${alarm.id})">✕</button>
+        </div>
+      `;
+      list.appendChild(item);
+    });
+  }
+
+  setInterval(updateClock, 1000);
+  setInterval(checkAlarms, 1000);
+  updateClock();
+  renderAlarms();
+</script>
 </body>
 </html>
